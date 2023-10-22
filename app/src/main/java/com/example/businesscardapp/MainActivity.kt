@@ -12,6 +12,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,17 +24,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -43,6 +52,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.businesscardapp.ui.theme.BusinessCardAppTheme
+import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,14 +71,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+val colors = listOf(Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Magenta, Color.Cyan)
 
 
 @Composable
 fun BusinessCard(name: String, modifier: Modifier = Modifier) {
+    var isLogoClicked by remember { mutableStateOf(true) }
+    var randomColor by remember { mutableStateOf(0) }
+    val logoColor = if (isLogoClicked) {
+        MaterialTheme.colorScheme.onSurface
+    }
+    else {
+         colors[randomColor]
+    }
+
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-    val scale by infiniteTransition.animateFloat(
-        initialValue = 1.0f,
-        targetValue = 1.1f,
+    val scaleValue by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.05f,
         animationSpec = infiniteRepeatable(
             animation = tween(1000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
@@ -81,19 +101,23 @@ fun BusinessCard(name: String, modifier: Modifier = Modifier) {
     ) {
         Box(
             modifier = Modifier
-                .scale(scale, scale)
+                .scale(scaleValue)
         ){
             Image(
                 painterResource(id = R.drawable.logo),
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+                colorFilter = ColorFilter.tint(logoColor),
                 contentDescription = "Cards icon",
                 modifier = Modifier
                     .clip(RoundedCornerShape(16.dp))
                     .border(
                         5.dp,
-                        MaterialTheme.colorScheme.onSurface,
+                        logoColor,
                         shape = RoundedCornerShape(16.dp)
                     )
+                    .clickable { isLogoClicked = !isLogoClicked
+                    if(!isLogoClicked){
+                        randomColor = Random.nextInt(colors.size)
+                    }}
             )
         }
         Column(
@@ -108,9 +132,27 @@ fun BusinessCard(name: String, modifier: Modifier = Modifier) {
             )
             Text(
                 text = "Android developer",
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontSize = 15.sp,
                 fontFamily = FontFamily.Monospace,
             )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(
+                    modifier = Modifier
+                        .scale(.8f),
+                    imageVector = Icons.Default.Phone,
+                    contentDescription = "phone icon",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Text(
+                    text = "+420 604 334 487",
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    fontSize = 12.sp,
+                    fontFamily = FontFamily.Monospace,
+                )
+            }
         }
         ContactsCard()
     }
@@ -125,6 +167,7 @@ fun ContactsCard(modifier: Modifier = Modifier) {
     val cardWidth = screenWidth - 30.dp
     Card(
         shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
         modifier = Modifier
             .width(cardWidth)
@@ -176,10 +219,28 @@ fun ContactsCard(modifier: Modifier = Modifier) {
                 verticalArrangement = Arrangement.SpaceEvenly
             )
             {
-                Text(text = "m_goldbach@utb.cz")
-                Text(text = "@m_goldbach")
-                Text(text = "@m_goldbach")
-                Text(text = "@m_goldbach")
+                Text(
+                    text = "m_goldbach@utb.cz",
+                    fontFamily = FontFamily.Monospace,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+
+                    )
+                Text(text = "@m_goldbach",
+                    fontFamily = FontFamily.Monospace,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+
+                    )
+                Text(text = "@m_goldbach",
+                    fontFamily = FontFamily.Monospace,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+
+                    )
+                Text(text = "@m_goldbach",
+                    fontFamily = FontFamily.Monospace,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    modifier = Modifier.clickable {  }
+
+                    )
 
             }
 
